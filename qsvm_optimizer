@@ -1,0 +1,67 @@
+from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister, Aer
+from qiskit.aqua.algorithms import QSVM
+from qiskit.aqua.components.optimizers import COBYLA
+from qiskit.aqua.components.feature_maps import RawFeatureVector
+
+import numpy as np
+
+# Load the iris dataset and preprocess it
+from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
+
+data = load_iris()
+X = data.data
+y = data.target
+
+# Encode the input features using amplitude encoding
+num_qubits = len(X[0])
+feature_map = RawFeatureVector(num_qubits)
+
+# Define the quantum circuit as the kernel
+qc = QuantumCircuit(num_qubits)
+theta = np.random.rand()
+phi = np.random.rand()
+gamma = np.random.rand()
+
+qc.ry(theta, 0)
+qc.ry(phi, 1)
+qc.cx(0, 1)
+qc.ry(gamma, 0)
+qc.cx(0, 1)
+qc.ry(phi, 1)
+
+# Use the one-vs-all approach to classify the three classes
+svm = QSVM(feature_map, qc, COBYLA())
+svm.setup_quantum_backend(backend=Aer.get_backend('qasm_simulator'))
+
+# Split the data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+
+# Define the cost function for the binary classifier
+def cost(params):
+    svm.quantum_instance.reset_eval_count()
+    svm.quantum_instance.circuit_parameters = params
+    result = svm.test(X_test)
+    accuracy = result['testing_accuracy']
+    return 1 - accuracy
+
+# Optimize the circuit parameters using gradient descent
+lr = 0.1
+max_iter = 100
+params = [theta, phi, gamma]
+
+for i in range(max_iter):
+    grad = np.zeros(len(params))
+    for j in range(len(params)):
+        params_plus = params.copy()
+        params_plus[j] += np.pi/2
+        cost_plus = cost(params_plus)
+
+        params_minus = params.copy()
+        params_minus[j] -= np.pi/2
+        cost_minus = cost(params_minus)
+
+        grad[j] = (cost_plus - cost_minus) / 2
+
+    params = params - lr * grad
+    print('Iteration {}: cost={}, params={}'.format(i, cost(params), params))
