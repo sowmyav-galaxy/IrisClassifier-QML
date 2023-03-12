@@ -1,0 +1,57 @@
+#imports
+import numpy as np
+from qiskit import Aer
+from qiskit.aqua.algorithms import QSVM
+from qiskit.aqua.components.feature_maps import SecondOrderExpansion
+from qiskit.aqua.components.multiclass_extensions import OneAgainstRest
+from qiskit.circuit.library import PauliFeatureMap
+from qiskit.datasets import load_iris
+from qiskit.tools.monitor import job_monitor
+
+iris = load_iris()
+
+#encoding data into quantum state using amplitude encoding
+#normalize the features to be between -1 and 1
+#encode each feature into a quantum state using the formula |x⟩ = cos(π/2*x)|0⟩ + sin(π/2*x)|1⟩
+
+def amplitude_encoding(data):
+    norm_data = 2 * (data - np.min(data, axis=0)) / np.ptp(data, axis=0) - 1
+    num_qubits = len(data[0])
+    qc_list = []
+    for datapoint in norm_data:
+        qc = QuantumCircuit(num_qubits)
+        for i, feature in enumerate(datapoint):
+            qc.ry(np.arcsin(feature), i)
+            qc.rz(np.arccos(feature), i)
+        qc_list.append(qc)
+    return qc_list
+
+datapoints = iris.data
+labels = iris.target
+
+qcs = amplitude_encoding(datapoints)
+
+#proposing a kernel
+def quantum_kernel(x1, x2, depth=1):
+    circuit = QuantumCircuit(x1[0].num_qubits)
+    feature_map = PauliFeatureMap(x1[0].num_qubits, reps=depth)
+    circuit.append(feature_map, range(x1[0].num_qubits))
+    for i in range(x1[0].num_qubits):
+        circuit.h(i)
+        circuit.cx(i, x1[i])
+        circuit.cx(i, x2[i])
+        circuit.ccx(x1[i], x2[i], i)
+    circuit.append(feature_map, range(x1[0].num_qubits))
+    return circuit
+
+kernel = lambda x1, x2: quantum_kernel(x1, x2, depth=1)
+
+#training three binary classifiers, one for each species against the other two
+classes = np.unique(labels)
+classifiers = {}
+for species in classes:
+    binary_labels = np.where(labels == species, 1, 0)
+    qsvm = QSVM(kernel, OneAgainstRest(), binary_labels)
+    backend = Aer.get_backend('qasm_simulator')
+    quantum_instance = QuantumInstance(backend, shots=1024)
+    result = q
