@@ -69,3 +69,7 @@ for species in classes:
     backend = Aer.get_backend('qasm_simulator')
     quantum_instance = QuantumInstance(backend, shots=1024)
     result = q
+
+print("The number of qubits is:", feature_map.num_qubits)
+print("The circuit depth is:", feature_map.depth())
+print(f"QSVM accuracy: {qsvm_acc}")
