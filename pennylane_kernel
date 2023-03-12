@@ -34,7 +34,7 @@ y_scaled = 2 * (y - 0.5)
 X_train, X_test, y_train, y_test = train_test_split(X_scaled, y_scaled)
 
 n_qubits = len(X_train[0])
-n_qubits
+
 
 dev_kernel = qml.device("default.qubit", wires=n_qubits)
 
@@ -58,3 +58,6 @@ svm = SVC(kernel=kernel_matrix).fit(X_train, y_train)
 predictions = svm.predict(X_test)
 accuracy_score(predictions, y_test)
 
+print("The number of qubits is:", n_qubits)
+print(f"Depth: {len(svm.support_vectors_[0])}")
+print(f"Accuracy: {acc}")
