@@ -60,7 +60,7 @@ plt.figure(figsize=(5, 5))
 plt.ylim(0, 2 * np.pi)
 plt.xlim(0, 2 * np.pi)
 plt.imshow(
-    np.asmatrix(adhoc_total).T,
+    np.asmatrix(iris_total).T,
     interpolation="nearest",
     origin="lower",
     cmap="RdBu",
