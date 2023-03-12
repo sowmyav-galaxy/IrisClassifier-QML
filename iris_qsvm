@@ -32,7 +32,7 @@ labels = iris.target
 
 qcs = amplitude_encoding(datapoints)
 
-#proposing a kernel
+#proposing a kernel, using Swap Test
 def quantum_kernel(x1, x2, depth=1):
     circuit = QuantumCircuit(x1[0].num_qubits)
     feature_map = ZZFeatureMap(x1[0].num_qubits, reps=depth)
