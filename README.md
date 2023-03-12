@@ -22,6 +22,20 @@ Generate a Quantum Support Vector Machine (QSVM) using the iris dataset and try 
 
 **One-vs-All Format** - in this example, for the three classes, there will be three separate binary classfiers each trained to answer only one classification question affirmatively or negatively; works best with few number of classes [3] <br>
 
+## Files Description
+- iris_dataset_intro - has basic information about the iris dataset <br>
+
+- iris_qsvm - <br>
+
+- pennylane_kernel - defines a quantum kernel using the AngleEmbedding and Hermitian operations from PennyLane <br>
+
+- qiskit_kernel - uses the QuantumKernelTrainer from Qiskit to find the optimized kernel and the trained quantum kernel is used to initialize a QSVC class instance for classification <br>
+
+- qsvm_optimizer - uses gradient descent to optimize circuit parameters for generating QSVM <br>
+
+- qsvm_with_PauliFeatureMap - uses PauliFeatureMap to encode data and generate QSVM <br>
+
+- qsvm_with_ZZFeatureMap - uses ZZFeatureMap to encode data and generate QSVM <br>
 
 ## References
 [1] Schuld and Killoran (2018) https://arxiv.org/pdf/1803.07128.pdf <br>
