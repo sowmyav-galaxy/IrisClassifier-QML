@@ -25,6 +25,8 @@ Generate a Quantum Support Vector Machine (QSVM) using the iris dataset and try 
 ## Files Description
 - iris_dataset_intro - has basic information about the iris dataset <br>
 
+- iris_qsvm - uses Swap Test to define quantum kernel and train QSVM <br>
+
 - pennylane_kernel - defines a quantum kernel using the AngleEmbedding and Hermitian operations from PennyLane <br>
 
 - qiskit_kernel - uses the QuantumKernelTrainer from Qiskit to find the optimized kernel and the trained quantum kernel is used to initialize a QSVC class instance for classification <br>
