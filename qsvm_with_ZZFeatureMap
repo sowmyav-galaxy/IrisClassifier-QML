@@ -23,6 +23,7 @@ test_labels = iris["target"][test_idx]
 train_features_norm = (train_features - np.mean(train_features, axis=0)) / np.std(train_features, axis=0)
 test_features_norm = (test_features - np.mean(train_features, axis=0)) / np.std(train_features, axis=0)
 
+# Define quantum kernel using ZZFeatureMap
 def quantum_kernel(circuit):
     def kernel(x1, x2):
         qc = circuit.bind_parameters({param: val for param, val in zip(circuit.parameters, np.concatenate((x1, x2)))})
@@ -33,6 +34,7 @@ def quantum_kernel(circuit):
 
 feature_map = ZZFeatureMap(feature_dimension=4, reps=1)
 
+# Train QSVM using kernel
 qsvm = QSVM(feature_map, quantum_kernel(feature_map), OneAgainstRest())
 
 qsvm.fit(train_features_norm, train_labels)
