@@ -49,6 +49,7 @@ for species, qsvm in classifiers.items():
 # Compute the accuracy score of the QSVM
 accuracy = accuracy_score(y_test, y_pred)
 
+# Print results
 print("The number of qubits is", feature_map.num_qubits)
 print("The depth of the circuit is", feature_map.depth())
 print(f"QSVM accuracy: {accuracy}")
