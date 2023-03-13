@@ -35,7 +35,7 @@ X_train, X_test, y_train, y_test = train_test_split(X_scaled, y_scaled)
 
 n_qubits = len(X_train[0])
 
-
+# defines a quantum kernel using PennyLane's AngleEmbedding and Hermitian gates
 dev_kernel = qml.device("default.qubit", wires=n_qubits)
 
 projector = np.zeros((2**n_qubits, 2**n_qubits))
@@ -48,16 +48,20 @@ def kernel(x1, x2):
     qml.adjoint(AngleEmbedding)(x2, wires=range(n_qubits))
     return qml.expval(qml.Hermitian(projector, wires=range(n_qubits)))
     
+# calculate matrix whose entries are the kernel evaluated on pairwise data from the training and testing sets 
 def kernel_matrix(A, B):
     """Compute the matrix whose entries are the kernel
        evaluated on pairwise data from sets A and B."""
     return np.array([[kernel(a, b) for b in B] for a in A])
 
+# use kernel matrix to fit SVM
 svm = SVC(kernel=kernel_matrix).fit(X_train, y_train)
 
+# make predictions on test data
 predictions = svm.predict(X_test)
 accuracy_score(predictions, y_test)
 
+# print results
 print("The number of qubits is:", n_qubits)
 print(f"Depth: {len(svm.support_vectors_[0])}")
 print(f"Accuracy: {acc}")
